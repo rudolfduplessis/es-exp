@@ -1,36 +1,94 @@
-import com.twitter.scrooge.{ThriftStruct, ThriftStructCodec}
-import io.centular.meter.model.{MeterCreated, MeterModel, MeterStatus, MeterType}
+  import java.util.UUID
 
-import scala.reflect.classTag
-import scala.reflect.runtime.universe._
-import scala.reflect.runtime.{universe => ru}
+  import infrastructure.Event
+  import org.joda.time.DateTime
+  import spray.json.DefaultJsonProtocol._
+  import spray.json._
 
-val m = MeterCreated("Some Meter",
-  "ZZ-123",
-  MeterType.Water,
-  MeterStatus.Inactive,
-  Option(MeterModel("asdf", "ZXCV-1234")))
 
-def getTypeTag[T: ru.TypeTag](obj: T) = ru.typeTag[T]
-val typeName = getTypeTag(m).tpe.toString
-// to db then back
-val clazz = Class.forName(typeName)
-getDecoder(typeName).
 
-def getDecoder(clazz: String):ThriftStructCodec[_] = {
-  clazz match {
-    case c if c == typeTag[MeterCreated].tpe.toString => MeterCreated
+  case class PersonCreated(name: String, surname: String)
+  case class NameChanged(name: String)
+  case class SurnameChanged(surname: String)
+
+  val createdEvent =
+    new Event(
+      UUID.randomUUID(),
+      "Created",
+      DateTime.now().toString,
+      "",
+      UUID.randomUUID(),
+      UUID.randomUUID(), PersonCreated("Rudolf", "Du Plessis"))
+
+  val nameChangedEvent =
+    new Event(
+      UUID.randomUUID(),
+      "Name Changed",
+      DateTime.now().toString,
+      "",
+      UUID.randomUUID(),
+      UUID.randomUUID(), NameChanged("Dolf"))
+
+  val surnameChangedEvent =
+    new Event(
+      UUID.randomUUID(),
+      "Surname Changed",
+      DateTime.now().toString,
+      "",
+      UUID.randomUUID(),
+      UUID.randomUUID(), SurnameChanged("du Plessis"))
+
+  val json = createdEvent.toJson(EventJsonProtocol.eventJsonFormat(jsonFormat2(PersonCreated.apply))).prettyPrint
+  val obj = json.parseJson.convertTo[Event[PersonCreated]](EventJsonProtocol.eventJsonFormat(jsonFormat2(PersonCreated.apply)))
+  val payload = createdEvent.payload.toJson(jsonFormat2(PersonCreated.apply))
+
+
+  case class Person(name: String, surname: String)
+
+  trait EventProcessor[T] {
+    def process(aggregate: T, event: Event[_]): T
   }
-}
+
+  object PersonEventProcessor extends EventProcessor[Person] {
+    override def process(aggregate: Person, event: Event[_]): Person = event.payload match {
+      case e: PersonCreated => Person(e.name, e.surname)
+      case e: NameChanged => aggregate.copy(name = e.name)
+      case e: SurnameChanged => aggregate.copy(surname = e.surname)
+    }
+  }
+
+  object EventSource {
+    def getById(id: UUID): Person = {
+      val person = Person("", "")
+      Seq(createdEvent, nameChangedEvent, surnameChangedEvent)
+        .foldLeft(person)((a: Person, e:Event[_]) => PersonEventProcessor.process(a, e))
+
+    }
+  }
+
+  EventSource.getById(UUID.randomUUID())
 
 
-/*X(clazz)
 
-def X[T: TypeTag](ob: Class[T]) = ob match {
-  case x if typeOf[T] <:< typeOf[MeterCreated]   => println("MeterCreated thing")
-  case x if typeOf[T] <:< typeOf[Boolean]  => println("Boolean obs")
-  case x if typeOf[T] <:< typeOf[Int]      => println("Int obs")
-}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

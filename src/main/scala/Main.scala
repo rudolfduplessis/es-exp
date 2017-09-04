@@ -1,22 +1,11 @@
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.text.SimpleDateFormat
-import java.util.{Date, UUID}
-
-import anorm.SqlParser._
-import anorm.{SqlParser, _}
 import com.fasterxml.uuid.Generators
-import com.twitter.scrooge.{ThriftStruct, ThriftStructCodec}
-import commands.CreateMeterCommand
 import io.centular.common.CentularPostgres.dataSource
 import io.centular.common.FlywayMigration
-import io.centular.meter.model._
-import io.centular.user.model.User
-import model.{MeterCommandProcessor, MeterEventCodec}
-import org.apache.thrift.protocol.TCompactProtocol
-import org.apache.thrift.transport.TIOStreamTransport
+import io.centular.common.lib.ID
+import io.centular.common.model.Context
+import repositories.MeterRepo
 
 import scala.reflect.runtime.{universe => ru}
-import scala.util.{Failure, Success, Try}
 
 /**
   * Created by rudolf on 2017/08/04.
@@ -128,20 +117,12 @@ object Main extends App {
   }*/
 
   val userId = Generators.timeBasedGenerator().generate().toString
+  implicit val context =
+    Context("66a56910-8ff7-11e7-abc4-cec278b6b50a", "a6ee411e-91ae-11e7-abc4-cec278b6b50a", "3bec333a-8ff6-11e7-abc4-cec278b6b50a")
 
-  val meterRepo = new MeterRepository(new MeterCommandProcessor, new MeterEventCodec)
-  val createdMeter = meterRepo.create(userId, User.getClass.getCanonicalName,
-    new CreateMeterCommand(
-      "Some Meter",
-      "ZZ-123",
-      MeterType.Water,
-      MeterStatus.Inactive,
-      Option(MeterModel("asdf", "ZXCV-1234")))) match {
-    case Success(newMeter) =>
-      val meter = meterRepo.getById(newMeter.id)
-      println(meter)
-    case Failure(ex) => println(ex.getMessage)
-  }
+  //MeterRepo.perform(CreateMeter("My Meter Bla", "12344567"))
+  println(MeterRepo.getById(ID("091d09bf-91b7-11e7-9bce-fdba425e2af9")))
+
 /*  val m = MeterCreated("Some Meter",
     "ZZ-123",
     MeterType.Water,

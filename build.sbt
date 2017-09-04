@@ -5,7 +5,7 @@ version := "1.0"
 scalaVersion := "2.11.8"
 
 resolvers += "twitter-repo" at "https://maven.twttr.com"
-//resolvers += "centular-repo" at "http://nexus.centular.io/repository/centular/"
+resolvers += "centular-repo" at "http://nexus.centular.io/repository/centular/"
 
 libraryDependencies ++= {
   val finagleV = "6.40.0"
@@ -16,7 +16,7 @@ libraryDependencies ++= {
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
 libraryDependencies += "ch.qos.logback" %  "logback-classic" % "1.1.8"
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "3.0.0"
-libraryDependencies += "io.centular" % "service-libs_2.11" % "0.14"
+libraryDependencies += "io.centular" % "service-libs_2.11" % "0.14-SNAPSHOT"
 libraryDependencies += "org.flywaydb" % "flyway-core" % "4.0.3"
 libraryDependencies += "com.typesafe.play" %% "anorm" % "2.5.2"
 libraryDependencies += "net.postgis" % "postgis-jdbc" % "2.2.1"
