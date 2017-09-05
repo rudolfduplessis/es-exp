@@ -20,7 +20,11 @@ case class Meter(id: ID,
 
 class MeterCommandProcessor extends CommandProcessor[ID, Meter] {
   override def process(command: AggregateCommand[ID], aggregate: Option[Meter]): Seq[Event[ID]] = command match {
-    case c: CreateMeter => Seq(MeterCreated(ID(), DateTime.now().toString, ID("3bec333a-8ff6-11e7-abc4-cec278b6b50a"), None, ID(), c.name, c.number))
+    case c: CreateMeter => {
+      val dt = DateTime.now().toString
+      Seq(MeterCreated(ID(), dt, dt, ID("3bec333a-8ff6-11e7-abc4-cec278b6b50a"), None, ID(), c.name, c.number))
+    }
+
     case other => throw new Exception(s"No command processor found for ${command.getClass.getName}")
   }
 }

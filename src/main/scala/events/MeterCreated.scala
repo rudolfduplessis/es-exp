@@ -10,6 +10,7 @@ import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat, _}
 
 case class MeterCreated(eventId: ID,
                         eventRaised: String,
+                        eventApplies: String,
                         eventSenderId: ID,
                         eventDescription: Option[String],
                         aggregateId: ID,
@@ -23,10 +24,11 @@ object MeterCreatedJsonProtocol extends DefaultJsonProtocol {
   implicit object MeterCreatedFormat extends RootJsonFormat[MeterCreated] {
     override def read(json: JsValue): MeterCreated = {
       val jsObject = json.asJsObject
-      jsObject.getFields("eventId", "eventRaised", "eventSenderId", "aggregateId", "name", "number") match {
-        case Seq(eventId, eventRaised, eventSenderId, aggregateId, name, number) => MeterCreated(
+      jsObject.getFields("eventId", "eventRaised", "eventApplies", "eventSenderId", "aggregateId", "name", "number") match {
+        case Seq(eventId, eventRaised, eventApplies, eventSenderId, aggregateId, name, number) => MeterCreated(
           eventId.convertTo[ID],
           eventRaised.convertTo[String],
+          eventApplies.convertTo[String],
           eventSenderId.convertTo[ID],
           jsObject.fields.get("eventDescription").map(_.convertTo[String]),
           aggregateId.convertTo[ID],
@@ -40,6 +42,7 @@ object MeterCreatedJsonProtocol extends DefaultJsonProtocol {
         Some("eventId" -> obj.eventId.toJson),
         Some("eventName" -> obj.eventName.toJson),
         Some("eventRaised" -> obj.eventRaised.toJson),
+        Some("eventApplies" -> obj.eventApplies.toJson),
         obj.eventDescription.map(d => "eventDescription" -> d.toJson),
         Some("eventSenderId" -> obj.eventSenderId.toJson),
         Some("aggregateId" -> obj.aggregateId.toJson),

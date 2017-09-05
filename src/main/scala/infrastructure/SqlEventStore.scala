@@ -24,7 +24,11 @@ trait SqlEventStore[ID <: Identifier[_]] {
 
   protected def insertSnapshotStatement(snapshot: JsValue)(implicit context: Context): SimpleSql[Row]
 
-  protected def selectEventsQuery(aggregateId: ID, untilConditions: Map[String, AnyVal])(implicit context: Context): Seq[JsValue]
+  protected def selectEventsAsAtQuery(aggregateId: ID, asAtDateTime: String)(implicit context: Context): Seq[JsValue]
+
+  protected def selectEventsAsOfQuery(aggregateId: ID, asOfDateTime: String)(implicit context: Context): Seq[JsValue]
 
   protected def selectSnapshotQuery(aggregateId: ID)(implicit context: Context): Option[JsValue]
+
+  protected def auditQuery(aggregateId: ID)(implicit context: Context): Seq[AuditItem]
 }

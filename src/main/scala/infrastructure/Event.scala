@@ -9,6 +9,7 @@ trait Event[ID <: Identifier[_]] {
   val eventId: ID
   val eventName: String
   val eventRaised: String
+  val eventApplies: String
   val eventDescription: Option[String]
   val eventSenderId: ID
   val aggregateId: ID
