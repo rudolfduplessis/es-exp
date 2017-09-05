@@ -19,6 +19,7 @@ case class MeterCreated(eventId: ID,
 }
 
 object MeterCreatedJsonProtocol extends DefaultJsonProtocol {
+
   implicit object MeterCreatedFormat extends RootJsonFormat[MeterCreated] {
     override def read(json: JsValue): MeterCreated = {
       val jsObject = json.asJsObject

@@ -120,8 +120,8 @@ object Main extends App {
   implicit val context =
     Context("66a56910-8ff7-11e7-abc4-cec278b6b50a", "a6ee411e-91ae-11e7-abc4-cec278b6b50a", "3bec333a-8ff6-11e7-abc4-cec278b6b50a")
 
-  //MeterRepo.perform(CreateMeter("My Meter Bla", "12344567"))
-  println(MeterRepo.getById(ID("091d09bf-91b7-11e7-9bce-fdba425e2af9")))
+  //MeterRepo.execute(CreateMeter("Some other meter", "11111"))
+  println(MeterRepo.getById(ID("502bd4ad-9253-11e7-a352-b1bbb6b128d7")))
 
 /*  val m = MeterCreated("Some Meter",
     "ZZ-123",

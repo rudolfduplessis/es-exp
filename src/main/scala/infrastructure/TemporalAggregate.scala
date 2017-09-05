@@ -8,3 +8,5 @@ import io.centular.common.lib.Identifier
 trait TemporalAggregate[ID <: Identifier[_], TAggregate] {
   def apply(event: Event[ID]): TAggregate
 }
+
+
