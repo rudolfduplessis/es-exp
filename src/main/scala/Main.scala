@@ -5,8 +5,6 @@ import io.centular.common.lib.ID
 import io.centular.common.model.Context
 import repositories.MeterRepo
 
-import scala.reflect.runtime.{universe => ru}
-
 /**
   * Created by rudolf on 2017/08/04.
   */
