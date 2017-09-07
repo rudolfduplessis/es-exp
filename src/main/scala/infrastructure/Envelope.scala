@@ -20,14 +20,13 @@ class Envelope private(val eventId: ID,
                        val event: Event)
 
 object Envelope {
-  def apply(eventName: String,
-            aggregateId: ID,
+  def apply(aggregateId: ID,
             event: Event,
             eventApplies: Option[String] = None,
             eventDescription: Option[String] = None)
            (implicit context: Context): Envelope = {
     val now = DateTime.now.toString
-    new Envelope(ID(), eventName, now, eventApplies.getOrElse(now), eventDescription, ID(context.userId), aggregateId, event)
+    new Envelope(ID(), event.getClass.getSimpleName, now, eventApplies.getOrElse(now), eventDescription, ID(context.userId), aggregateId, event)
   }
 
   private [infrastructure] def apply(eventId: ID,

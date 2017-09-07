@@ -7,6 +7,7 @@ import anorm.SqlParser._
 import anorm.{RowParser, ~}
 import infrastructure.data.JsColumn._
 import io.centular.common.lib.ID
+import org.joda.time.DateTime
 import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat, _}
 
 /**
@@ -25,14 +26,14 @@ private [infrastructure] object Event {
   val parser: RowParser[Event] = {
     get[UUID]("event_id") ~
     get[String]("event_name") ~
-    get[String]("event_raised") ~
-    get[String]("event_applies") ~
+    get[DateTime]("event_raised") ~
+    get[DateTime]("event_applies") ~
     get[Option[String]]("event_description") ~
     get[UUID]("event_sender_id") ~
     get[UUID]("aggregate_id") ~
     get[JsValue]("event") map {
       case eventId ~ eventName ~ eventRaised ~ eventApplies ~ eventDescription ~ eventSenderId ~ aggregateId ~ event =>
-        Event(ID(eventId), eventName, eventRaised, eventApplies, eventDescription, ID(eventSenderId), ID(aggregateId), event)
+        Event(ID(eventId), eventName, eventRaised.toString, eventApplies.toString, eventDescription, ID(eventSenderId), ID(aggregateId), event)
     }
   }
 

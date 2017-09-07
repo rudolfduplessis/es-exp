@@ -17,11 +17,11 @@ case class Meter(id: ID,
 
   override def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope] = command match {
     case c: CreateMeter =>
-      Seq(Envelope(classOf[MeterCreated].getSimpleName, ID(), MeterCreated(c.name, c.number)))
+      Seq(Envelope(ID(), MeterCreated(c.name, c.number)))
     case c: ChangeMeterName =>
-      Seq(Envelope(classOf[MeterNameChanged].getSimpleName, id, MeterNameChanged(c.name)))
+      Seq(Envelope(id, MeterNameChanged(c.name)))
     case c: ChangeMeterNumber =>
-      Seq(Envelope(classOf[MeterNumberChanged].getSimpleName, id, MeterNumberChanged(c.number)))
+      Seq(Envelope(id, MeterNumberChanged(c.number)))
     case other => throw new Exception(s"No command processor found for ${command.getClass.getName}")
   }
 
@@ -53,6 +53,5 @@ trait MeterJsonProtocol extends AggregateJsonProtocol[ID, Meter] with DefaultJso
       case e: MeterNameChanged => MeterNameChanged.jsonFormat.write(e)
       case e: MeterNumberChanged => MeterNumberChanged.jsonFormat.write(e)
     }
-
   }
 }
