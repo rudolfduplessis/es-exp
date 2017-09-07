@@ -1,12 +1,14 @@
 package repositories
 
-import infrastructure._
-import io.centular.common.lib.ID
-import model.{Meter, MeterCommandProcessor, MeterFactory}
+import infrastructure.data.PostgreSqlEventStore
+import infrastructure.repo.TemporalAggregateRepository
+import io.centular.common.lib.{EmptyID, ID}
+import model.{Meter, MeterJsonProtocol}
 
 /**
   * Created by rudolf on 2017/08/27.
   */
-object MeterRepo extends PostgresSqlEventStore[ID] with TemporalAggregateRepository[ID, Meter] with MeterFactory {
-  override val commandProcessor: CommandProcessor[ID, Meter] = new MeterCommandProcessor()
+object MeterRepo extends PostgreSqlEventStore[ID]("event_schema", "event", "snapshot")
+  with TemporalAggregateRepository[ID, Meter] with MeterJsonProtocol {
+  override val emptyAggregate: Meter = Meter(EmptyID, -1, "", "")
 }

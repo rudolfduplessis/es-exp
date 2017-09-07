@@ -1,51 +1,58 @@
 package model
 
-import commands.CreateMeter
-import events.{MeterCreated, MeterCreatedJsonProtocol}
+import commands.{ChangeMeterName, ChangeMeterNumber, CreateMeter}
+import events._
 import infrastructure._
-import io.centular.common.lib.{EmptyID, ID}
-import org.joda.time.DateTime
+import io.centular.common.lib.ID
+import io.centular.common.model.Context
 import spray.json._
 
 /**
   * Created by rudolf on 2017/08/05.
   */
 case class Meter(id: ID,
+                 version: Int,
                  name: String,
                  number: String) extends TemporalAggregate[ID, Meter] {
-  def apply(event: Event[ID]): Meter = event match {
-    case e: MeterCreated => Meter(e.aggregateId, e.name, e.number)
-  }
-}
 
-class MeterCommandProcessor extends CommandProcessor[ID, Meter] {
-  override def process(command: AggregateCommand[ID], aggregate: Option[Meter]): Seq[Event[ID]] = command match {
-    case c: CreateMeter => {
-      val dt = DateTime.now().toString
-      Seq(MeterCreated(ID(), dt, dt, ID("3bec333a-8ff6-11e7-abc4-cec278b6b50a"), None, ID(), c.name, c.number))
-    }
-
+  override def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope] = command match {
+    case c: CreateMeter =>
+      Seq(Envelope(classOf[MeterCreated].getSimpleName, ID(), MeterCreated(c.name, c.number)))
+    case c: ChangeMeterName =>
+      Seq(Envelope(classOf[MeterNameChanged].getSimpleName, id, MeterNameChanged(c.name)))
+    case c: ChangeMeterNumber =>
+      Seq(Envelope(classOf[MeterNumberChanged].getSimpleName, id, MeterNumberChanged(c.number)))
     case other => throw new Exception(s"No command processor found for ${command.getClass.getName}")
   }
+
+  def applyEvent(envelope: Envelope): Meter = envelope.event match {
+    case e: MeterCreated => Meter(envelope.aggregateId, version + 1,  e.name, e.number)
+    case e: MeterNameChanged => copy(name = e.name, version = version + 1)
+    case e: MeterNumberChanged => copy(number = e.number, version = version + 1)
+  }
+
+  override def takeSnapshot: Boolean = version % 2 == 0 && version != 0
 }
 
-trait MeterFactory extends TemporalAggregateFactory[ID, Meter] with DefaultJsonProtocol {
-  override val emptyInstance = Meter(EmptyID, "", "")
+trait MeterJsonProtocol extends AggregateJsonProtocol[ID, Meter] with DefaultJsonProtocol {
 
-  implicit val eventJsonFormat: JsonFormat[Event[ID]] = new JsonFormat[Event[ID]] {
-    override def read(json: JsValue): Event[ID] = {
-      json.asJsObject.getFields("eventName") match {
-        case Seq(eventName) => eventName.convertTo[String] match {
-          case n if n == "Meter Created" => MeterCreatedJsonProtocol.MeterCreatedFormat.read(json)
-          case other => deserializationError(s"Cannot deserialize $eventName: invalid input. Raw input: " + other)
-        }
-      }
-    }
+  override implicit val aggregateJsonFormat: JsonFormat[Meter] = jsonFormat4(Meter.apply)
 
-    override def write(obj: Event[ID]): JsValue = obj match {
-      case e: MeterCreated => MeterCreatedJsonProtocol.MeterCreatedFormat.write(e)
+  override implicit def readJsonFor(eventName: String, json: JsValue): Event = {
+    eventName match {
+      case n if n == classOf[MeterCreated].getSimpleName => MeterCreated.jsonFormat.read(json)
+      case n if n == classOf[MeterNameChanged].getSimpleName => MeterNameChanged.jsonFormat.read(json)
+      case n if n == classOf[MeterNumberChanged].getSimpleName => MeterNumberChanged.jsonFormat.read(json)
+      case other => deserializationError(s"Cannot deserialize $eventName: invalid input. Raw input: " + other)
     }
   }
 
-  override implicit val aggregateJsonFormat: JsonFormat[Meter] = jsonFormat3(Meter.apply)
+  override implicit val eventJsonWriter: JsonWriter[Event] = new JsonWriter[Event] {
+    override def write(obj: Event): JsValue = obj match {
+      case e: MeterCreated => MeterCreated.jsonFormat.write(e)
+      case e: MeterNameChanged => MeterNameChanged.jsonFormat.write(e)
+      case e: MeterNumberChanged => MeterNumberChanged.jsonFormat.write(e)
+    }
+
+  }
 }
