@@ -13,7 +13,7 @@ import temporal._
 case class Meter(id: ID,
                  version: Int,
                  name: String,
-                 number: String) extends TemporalAggregate[ID, Meter] {
+                 number: String) extends Aggregate[ID, Meter] {
 
   override def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope] = command match {
     case c: CreateMeter =>

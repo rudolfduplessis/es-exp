@@ -6,7 +6,7 @@ import io.centular.common.model.Context
 /**
   * Created by rudolf on 2017/08/27.
   */
-trait TemporalAggregate[ID <: Identifier[_], TAggregate] {
+trait Aggregate[ID <: Identifier[_], TAggregate] {
   val id: ID
   val version: Int
   def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope]

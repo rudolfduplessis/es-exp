@@ -1,16 +1,15 @@
-package temporal.repo
+package temporal
 
 import io.centular.common.CentularPostgres.dataSource
 import io.centular.common.lib.Identifier
 import io.centular.common.model.Context
 import spray.json._
 import temporal.data.SqlEventStore
-import temporal.{Envelope, _}
 
 /**
   * Created by rudolf on 2017/08/26.
   */
-trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAggregate[ID, TAggregate]]
+trait AggregateRepository[ID <: Identifier[_], TAggregate <: Aggregate[ID, TAggregate]]
   extends SqlEventStore[ID] { this: AggregateJsonProtocol[ID, TAggregate] =>
 
   val emptyAggregate: TAggregate
