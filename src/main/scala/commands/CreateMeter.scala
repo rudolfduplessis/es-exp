@@ -1,9 +1,9 @@
 package commands
 
-import temporal.AggregateCommand
+import temporal.Command
 
 /**
   * Created by rudolf on 2017/08/05.
   */
 
-case class CreateMeter(name: String, number: String) extends AggregateCommand
+case class CreateMeter(name: String, number: String) extends Command

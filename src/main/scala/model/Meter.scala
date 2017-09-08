@@ -15,7 +15,7 @@ case class Meter(id: ID,
                  name: String,
                  number: String) extends Aggregate[ID, Meter] {
 
-  override def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope] = command match {
+  override def executeCommand(command: Command)(implicit context: Context): Seq[Envelope] = command match {
     case c: CreateMeter =>
       Seq(Envelope(ID(), MeterCreated(c.name, c.number)))
     case c: ChangeMeterName =>

@@ -9,7 +9,7 @@ import io.centular.common.model.Context
 trait Aggregate[ID <: Identifier[_], TAggregate] {
   val id: ID
   val version: Int
-  def executeCommand(command: AggregateCommand)(implicit context: Context): Seq[Envelope]
+  def executeCommand(command: Command)(implicit context: Context): Seq[Envelope]
   def applyEvent(envelope: Envelope): TAggregate
   def takeSnapshot: Boolean
 }

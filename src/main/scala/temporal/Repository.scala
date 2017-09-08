@@ -9,7 +9,7 @@ import temporal.data.SqlEventStore
 /**
   * Created by rudolf on 2017/08/26.
   */
-trait AggregateRepository[ID <: Identifier[_], TAggregate <: Aggregate[ID, TAggregate]]
+trait Repository[ID <: Identifier[_], TAggregate <: Aggregate[ID, TAggregate]]
   extends SqlEventStore[ID] { this: AggregateJsonProtocol[ID, TAggregate] =>
 
   val emptyAggregate: TAggregate
