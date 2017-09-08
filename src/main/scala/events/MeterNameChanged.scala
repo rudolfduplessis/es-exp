@@ -1,8 +1,8 @@
 package events
 
-import infrastructure.Event
 import spray.json.DefaultJsonProtocol._
 import spray.json._
+import temporal.Event
 
 /**
   * Created by rudolf on 2017/09/07.

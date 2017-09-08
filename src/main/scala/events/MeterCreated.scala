@@ -1,8 +1,8 @@
 package events
 
-import infrastructure.Event
 import spray.json.DefaultJsonProtocol._
-import spray.json.{JsonFormat, _}
+import spray.json.JsonFormat
+import temporal.Event
 
 /**
   * Created by rudolf on 2017/08/27.

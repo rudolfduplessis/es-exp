@@ -1,9 +1,9 @@
 package repositories
 
-import infrastructure.data.PostgreSqlEventStore
-import infrastructure.repo.TemporalAggregateRepository
 import io.centular.common.lib.{EmptyID, ID}
 import model.{Meter, MeterJsonProtocol}
+import temporal.data.PostgreSqlEventStore
+import temporal.repo.TemporalAggregateRepository
 
 /**
   * Created by rudolf on 2017/08/27.

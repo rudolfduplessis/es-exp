@@ -1,4 +1,4 @@
-package infrastructure
+package temporal
 
 import java.util.UUID
 

@@ -2,10 +2,10 @@ package model
 
 import commands.{ChangeMeterName, ChangeMeterNumber, CreateMeter}
 import events._
-import infrastructure._
 import io.centular.common.lib.ID
 import io.centular.common.model.Context
 import spray.json._
+import temporal._
 
 /**
   * Created by rudolf on 2017/08/05.

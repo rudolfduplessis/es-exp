@@ -1,4 +1,4 @@
-package infrastructure
+package temporal
 
 import io.centular.common.lib.Identifier
 import spray.json.{JsValue, JsonFormat, JsonWriter}

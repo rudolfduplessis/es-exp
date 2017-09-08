@@ -1,28 +1,28 @@
-package infrastructure.data
+package temporal.data
 
 
 import java.util.UUID
 
 import anorm.SqlParser._
 import anorm.{RowParser, ~}
-import infrastructure.data.JsColumn._
 import io.centular.common.lib.ID
 import org.joda.time.DateTime
 import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat, _}
+import temporal.data.JsColumn._
 
 /**
   * Created by rudolf on 2017/09/07.
   */
-private [infrastructure] case class Envelope(eventId: ID,
-                                             eventName: String,
-                                             eventRaised: String,
-                                             eventApplies: String,
-                                             eventDescription: Option[String],
-                                             eventSenderId: ID,
-                                             aggregateId: ID,
-                                             event: JsValue)
+private [temporal] case class Envelope(eventId: ID,
+                                       eventName: String,
+                                       eventRaised: String,
+                                       eventApplies: String,
+                                       eventDescription: Option[String],
+                                       eventSenderId: ID,
+                                       aggregateId: ID,
+                                       event: JsValue)
 
-private [infrastructure] object Envelope {
+private [temporal] object Envelope {
   val parser: RowParser[Envelope] = {
     get[UUID]("event_id") ~
     get[String]("event_name") ~
@@ -37,7 +37,7 @@ private [infrastructure] object Envelope {
     }
   }
 
-  private[infrastructure] implicit object EventJsonFormat extends DefaultJsonProtocol with RootJsonFormat[Envelope] {
+  private[temporal] implicit object EventJsonFormat extends DefaultJsonProtocol with RootJsonFormat[Envelope] {
     override def write(obj: Envelope): JsValue = JsObject(
       List(
         Some("eventId" -> obj.eventId.toJson),

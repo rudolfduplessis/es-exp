@@ -1,4 +1,4 @@
-package infrastructure
+package temporal
 
 import io.centular.common.lib.Identifier
 import io.centular.common.model.Context

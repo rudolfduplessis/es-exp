@@ -1,4 +1,4 @@
-package infrastructure.data
+package temporal.data
 
 import anorm.{Column, MetaDataItem, TypeDoesNotMatch}
 import spray.json.{JsValue, _}

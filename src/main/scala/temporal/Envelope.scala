@@ -1,4 +1,4 @@
-package infrastructure
+package temporal
 /**
   * Created by rudolf on 2017/09/07.
   */
@@ -29,14 +29,14 @@ object Envelope {
     new Envelope(ID(), event.getClass.getSimpleName, now, eventApplies.getOrElse(now), eventDescription, ID(context.userId), aggregateId, event)
   }
 
-  private [infrastructure] def apply(eventId: ID,
-                                     eventName: String,
-                                     eventRaised: String,
-                                     eventApplies: String,
-                                     eventDescription: Option[String],
-                                     eventSenderId: ID,
-                                     aggregateId: ID,
-                                     event: Event): Envelope =
+  private [temporal] def apply(eventId: ID,
+                               eventName: String,
+                               eventRaised: String,
+                               eventApplies: String,
+                               eventDescription: Option[String],
+                               eventSenderId: ID,
+                               aggregateId: ID,
+                               event: Event): Envelope =
     new Envelope(eventId, eventName, eventRaised, eventApplies, eventDescription, eventSenderId, aggregateId, event)
 
 

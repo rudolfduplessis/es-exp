@@ -1,6 +1,6 @@
 package commands
 
-import infrastructure.AggregateCommand
+import temporal.AggregateCommand
 
 /**
   * Created by rudolf on 2017/09/07.
