@@ -13,13 +13,13 @@ trait SqlEventStore[ID <: Identifier[_]] {
 
   protected def queryExists(id: ID)(implicit context: Context): Boolean
 
-  protected def persistEventStatement(event: Event)(implicit context: Context): SimpleSql[Row]
+  protected def persistEventStatement(event: Envelope)(implicit context: Context): SimpleSql[Row]
 
   protected def persistSnapshotStatement(snapshot: JsValue)(implicit context: Context): SimpleSql[Row]
 
-  protected def queryEventsAsAt(aggregateId: ID, asAtDateTime: String)(implicit context: Context): Seq[Event]
+  protected def queryEventsAsAt(aggregateId: ID, asAtDateTime: String)(implicit context: Context): Seq[Envelope]
 
-  protected def queryEventsAsOf(aggregateId: ID, asOfDateTime: String)(implicit context: Context): Seq[Event]
+  protected def queryEventsAsOf(aggregateId: ID, asOfDateTime: String)(implicit context: Context): Seq[Envelope]
 
   protected def querySnapshot(aggregateId: ID)(implicit context: Context): Option[JsValue]
 

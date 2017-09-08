@@ -35,7 +35,7 @@ class PostgreSqlEventStore[ID <: Identifier[_]](schema: String, eventTable: Stri
     }
   }
 
-  override protected def persistEventStatement(event: Event)(implicit context: Context): SimpleSql[Row] = {
+  override protected def persistEventStatement(event: Envelope)(implicit context: Context): SimpleSql[Row] = {
     SQL(
       s"""
          |INSERT INTO $schema.$eventTable (event_id, event_name, event_raised, event_applies, event_description, event_sender_id, aggregate_id, event, instance)
@@ -65,7 +65,7 @@ class PostgreSqlEventStore[ID <: Identifier[_]](schema: String, eventTable: Stri
         'instance -> context.instanceId)
   }
 
-  override protected def queryEventsAsAt(aggregateId: ID, asAtDateTime: String)(implicit context: Context): Seq[Event] = {
+  override protected def queryEventsAsAt(aggregateId: ID, asAtDateTime: String)(implicit context: Context): Seq[Envelope] = {
     implicit val con = dataSource.getConnection
     try {
       val results = SQL(
@@ -89,14 +89,14 @@ class PostgreSqlEventStore[ID <: Identifier[_]](schema: String, eventTable: Stri
           'aggregateId -> aggregateId.value.toString,
           'asAtDateTime -> asAtDateTime,
           'instance -> context.instanceId)
-        .executeQuery().as(Event.parser.*)
+        .executeQuery().as(Envelope.parser.*)
       results
     } finally {
       con.close()
     }
   }
 
-  override protected def queryEventsAsOf(aggregateId: ID, asOfDateTime: String)(implicit context: Context): Seq[Event] = {
+  override protected def queryEventsAsOf(aggregateId: ID, asOfDateTime: String)(implicit context: Context): Seq[Envelope] = {
     implicit val con = dataSource.getConnection
     try {
       val results = SQL(
@@ -120,7 +120,7 @@ class PostgreSqlEventStore[ID <: Identifier[_]](schema: String, eventTable: Stri
           'aggregateId -> aggregateId.value.toString,
           'asOfDateTime -> asOfDateTime,
           'instance -> context.instanceId)
-        .executeQuery().as(Event.parser.*)
+        .executeQuery().as(Envelope.parser.*)
       results
     } finally {
       con.close()

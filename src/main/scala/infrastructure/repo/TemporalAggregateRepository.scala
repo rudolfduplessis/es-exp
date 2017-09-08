@@ -1,7 +1,7 @@
 package infrastructure.repo
 
-import infrastructure._
-import infrastructure.data.{Event, SqlEventStore}
+import infrastructure.{Envelope, _}
+import infrastructure.data.SqlEventStore
 import io.centular.common.CentularPostgres.dataSource
 import io.centular.common.lib.Identifier
 import io.centular.common.model.Context
@@ -18,7 +18,7 @@ trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAgg
   final def exists(id: ID)(implicit context: Context): Boolean = queryExists(id)
 
   def save(aggregate: TAggregate, envelopes: Seq[Envelope])(implicit context: Context): TAggregate = {
-    val upToDateAggregate = foldEvents(envelopes.map(toEvent), Some(aggregate)).get
+    val upToDateAggregate = foldEvents(envelopes.map(toJson), Some(aggregate)).get
     val snapshot = if (upToDateAggregate.takeSnapshot) Some(upToDateAggregate) else None
     persist(envelopes, snapshot)
     upToDateAggregate
@@ -28,7 +28,7 @@ trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAgg
     implicit val con = dataSource.getConnection
     con.setAutoCommit(false)
     try {
-      envelopes.foreach(envelope => persistEventStatement(toEvent(envelope)).execute())
+      envelopes.foreach(envelope => persistEventStatement(toJson(envelope)).execute())
       aggregateSnapshot.map(aggregate => persistSnapshotStatement(aggregate.toJson).execute())
       con.commit()
     } catch {
@@ -40,9 +40,9 @@ trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAgg
     }
   }
 
-  protected final def foldEvents(events: Seq[Event], overAggregate: Option[TAggregate]): Option[TAggregate] =
-    events.foldLeft(overAggregate)((a: Option[TAggregate], e: Event) => {
-      Some(a.getOrElse(emptyAggregate).applyEvent(fromEvent(e)))
+  protected final def foldEvents(events: Seq[data.Envelope], overAggregate: Option[TAggregate]): Option[TAggregate] =
+    events.foldLeft(overAggregate)((a: Option[TAggregate], e: data.Envelope) => {
+      Some(a.getOrElse(emptyAggregate).applyEvent(fromJson(e)))
     })
 
   // Get a version of the aggregate at a point in time, WITHOUT retroactive events applied
@@ -59,8 +59,8 @@ trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAgg
     queryAuditLog(aggregateId)
   }
 
-  private def toEvent(e: Envelope): Event =
-    Event(
+  private def toJson(e: Envelope): data.Envelope =
+    data.Envelope(
       e.eventId,
       e.eventName,
       e.eventRaised,
@@ -70,7 +70,7 @@ trait TemporalAggregateRepository[ID <: Identifier[_], TAggregate <: TemporalAgg
       e.aggregateId,
       e.event.toJson)
 
-  private def fromEvent(e: Event): Envelope =
+  private def fromJson(e: data.Envelope): Envelope =
     Envelope(
       e.eventId,
       e.eventName,
